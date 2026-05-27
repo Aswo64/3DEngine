@@ -4,6 +4,65 @@ canvas.width = 1000
 canvas.height = 1000
 const ctx = canvas.getContext("2d")
 
+
+
+const dropzone = document.querySelector('.dropzone');
+const reader = new FileReader();
+
+reader.onload = function(e) {
+    const contents = e.target.result;
+    console.log(contents);
+};
+
+
+dropzone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    img.style.filter = 'invert(100%)';
+});
+
+dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('active')
+    e.dataTransfer.dropEffect = 'move';
+    img.style.filter = 'invert(100%)';
+});
+
+dropzone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('active')
+    img.style.filter = 'invert(0%)';
+});
+
+dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('active')
+    img.style.filter = '';
+    const { files } = e.dataTransfer;
+    if (files) {
+        reader.readAsText(files[0]); 
+    } else {
+        console.log("No file selected.");
+    }
+});
+
+
+document.getElementById('objFile').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        console.log(contents[0]);
+    };
+    reader.readAsText(file); 
+    
+});
+
+
 function clear() {
     ctx.fillStyle = bg
     ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -1184,18 +1243,15 @@ function frame() {
                 line(screen(project(v1)),screen(project((v2))))
             }
 
-
             if(i == 1){
                 const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
                 const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
                 if(n1.z >= 0 && mp.z >= 0){
                     line(screen(project(n1)), screen(project(mp)))
                     point(screen(project(n1)), n1.z)
-                    console.log(n1.z)
+                    //console.log(n1.z)
                 }
             }
-
-            
         }
     }
     
