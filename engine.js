@@ -50,7 +50,7 @@ let yaw = 0
 let mouseY = 0
 
 
-
+/*
 const vs = [
     {x: -0.086914, y: 0.277547, z: 0.400041},
     {x: -0.069555, y: 0.329698, z: 0.376422},
@@ -1004,35 +1004,35 @@ const fcs = [
     [323, 317, 299],
     [303, 317, 323],
 ]
-    
+*/
 
 
-// const vs = [
-//     {x:  0.25, y:  0.25, z:  -0.25},
-//     {x: -0.25, y:  0.25, z:  -0.25},
-//     {x: -0.25, y: -0.25, z:  -0.25},
-//     {x:  0.25, y: -0.25, z:  -0.25},
+const vs = [
+    {x:  0.25, y:  0.25, z:  -0.25},
+    {x: -0.25, y:  0.25, z:  -0.25},
+    {x: -0.25, y: -0.25, z:  -0.25},
+    {x:  0.25, y: -0.25, z:  -0.25},
 
-//     {x:  0.25, y:  0.25, z: 0.25},   
-//     {x: -0.25, y:  0.25, z: 0.25},
-//     {x: -0.25, y: -0.25, z: 0.25},
-//     {x:  0.25, y: -0.25, z: 0.25}, 
-// ]
+    {x:  0.25, y:  0.25, z: 0.25},   
+    {x: -0.25, y:  0.25, z: 0.25},
+    {x: -0.25, y: -0.25, z: 0.25},
+    {x:  0.25, y: -0.25, z: 0.25}, 
+]
 
-// const fcs = [
-//     [0, 1, 2],
-//     [0, 2, 3],
-//     [4, 6, 5],
-//     [4, 7, 6],
-//     [3,7,4],
-//     [3,4,0],
-//     [0,4,5],
-//     [0,5,1],
-//     [1,5,6],
-//     [1,6,2],
-//     [3,2,6],
-//     [3,6,7]
-// ]
+const fcs = [
+    [0, 1, 2],
+    [0, 2, 3],
+    [4, 6, 5],
+    [4, 7, 6],
+    [3,7,4],
+    [3,4,0],
+    [0,4,5],
+    [0,5,1],
+    [1,5,6],
+    [1,6,2],
+    [3,2,6],
+    [3,6,7]
+]
 
 function translate_z({ x, y, z }, dz) {
     return {
@@ -1168,37 +1168,22 @@ function frame() {
             if(v2.z <= 0 && v1.z <= 0){
                 continue
             }
-            if(v2.z <= 0){
-                const t = (0.001 - v2.z)/(v1.z-v2.z)
-                const v3 = addVector(v2, scalarVector(subVector(v1, v2), t))
-                line(screen(project(v1)),screen(project((v3))))
-                if(i == 1){
-                    const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    if(n1.z >= 0 && mp.z >= 0){
-                        line(screen(project(n1)), screen(project(mp)))
-                        point(screen(project(n1)), n1.z)
-                        console.log(n1.z)
-                    }
+            if (v1.z <= 0 || v2.z <= 0) {
+                let p1 = v1
+                let p2 = v2
+
+                if (v2.z <= 0) {
+                    p1 = v2
+                    p2 = v1
                 }
-                continue
+                const t = (0.001 - p1.z) / (p2.z - p1.z)
+                const v3 = addVector(p1, scalarVector(subVector(p2, p1), t))
+                line(screen(project(p2)),screen(project((v3))))
             }
-            if(v1.z <= 0){
-                //Research why the 0.001 can't just be 0
-                const t = (0.001 - v1.z)/(v2.z-v1.z)
-                const v3 = addVector(v1, scalarVector(subVector(v2, v1), t))
-                line(screen(project(v3)),screen(project((v2))))
-                if(i == 1){
-                    const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    if(n1.z >= 0 && mp.z >= 0){
-                        line(screen(project(n1)), screen(project(mp)))
-                        point(screen(project(n1)), n1.z)
-                        console.log(n1.z)
-                    }
-                }
-                continue
+            else{
+                line(screen(project(v1)),screen(project((v2))))
             }
+
 
             if(i == 1){
                 const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
@@ -1210,7 +1195,7 @@ function frame() {
                 }
             }
 
-            line(screen(project(v1)),screen(project((v2))))
+            
         }
     }
     
