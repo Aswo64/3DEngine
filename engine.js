@@ -63,8 +63,6 @@ function parseObjFile(fileText) {
 reader.onload = function(e) {
     const textContent = e.target.result;
     parseObjFile(textContent);
-    setTimeout(frame, 1000 / FPS)
-    
 };
 
 
@@ -157,6 +155,7 @@ function project({ x, y, z }) {
 }
 
 const FPS = 60
+setTimeout(frame, 1000 / FPS)
 let dz = 0
 let dx = 0
 let dy = 0
