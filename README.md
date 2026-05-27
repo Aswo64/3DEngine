@@ -2,7 +2,7 @@
 A 3d Engine I made in Javascript 
 
 Taught me:
-- Z buffering
+- Z buffering & Painters Algorithm
 - Projection Matrix
 - FOV Calculations
 - Homogoneous Coordinates
