@@ -288,6 +288,11 @@ function frame() {
 
     // Each face is to be a triangle
     for (const fc of fcs) {
+
+        const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[0]], vs[fc[1]], vs[fc[2]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+        const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(normVect(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]])), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+
+        //We do a for loop that takes the fc element length bcs some obj files do not only have triangles, some have quads and n-gons, so the code above me will only work if fc has at least 3 components (a triangle, can be anything more complex than a triangle though as long as it lies on one plane)
         for (let i = 0; i < fc.length; i++) {
             //Research how the rotation matrix works and why mouseY has to be negative
             yaw = mouseX*dt
@@ -313,15 +318,15 @@ function frame() {
                 line(screen(project(v1)),screen(project((v2))))
             }
 
-                // if(i == 1){
-                //     const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                //     const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i+1]], vs[fc[i-1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                //     if(n1.z >= 0 && mp.z >= 0){
-                //         line(screen(project(n1)), screen(project(mp)))
-                //         point(screen(project(n1)), n1.z)
-                //         //console.log(n1.z)
-                //     }
-                // }
+                if(i == 1){
+                    const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+                    const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(normVect(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]])), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+                    const normal = n1-mp
+                    if(n1.z >= 0 && mp.z >= 0){
+                        line(screen(project(n1)), screen(project(mp)))
+                        point(screen(project(n1)), n1.z)
+                    }
+                }
         }
     }
     setTimeout(frame, 1000 / FPS)
