@@ -283,7 +283,7 @@ function frame() {
         dx -= Math.cos(yaw) * speed * dt
         dz += Math.sin(yaw) * speed * dt
     }
-    angle += Math.PI * dt *1 /4
+    angle += Math.PI * dt *0 /4
     
 
     // Each face is to be a triangle
@@ -313,18 +313,17 @@ function frame() {
                 line(screen(project(v1)),screen(project((v2))))
             }
 
-            // if(i == 1){
-            //     const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-            //     const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-            //     if(n1.z >= 0 && mp.z >= 0){
-            //         line(screen(project(n1)), screen(project(mp)))
-            //         point(screen(project(n1)), n1.z)
-            //         //console.log(n1.z)
-            //     }
-            // }
+                // if(i == 1){
+                //     const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+                //     const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(crossProduct(vs[fc[i]], vs[fc[i+1]], vs[fc[i-1]]), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+                //     if(n1.z >= 0 && mp.z >= 0){
+                //         line(screen(project(n1)), screen(project(mp)))
+                //         point(screen(project(n1)), n1.z)
+                //         //console.log(n1.z)
+                //     }
+                // }
         }
     }
-    console.log(speed)
     setTimeout(frame, 1000 / FPS)
 }
 
