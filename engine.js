@@ -54,7 +54,7 @@ function parseObjFile(fileText) {
             }
     }
     //Recalculates the speed so viewing larger models aren't a pain in the ass
-    speed = Math.sqrt(biggest**2 + smallest**2)/2.5
+    speed = Math.sqrt(biggest**2 + smallest**2)/1.5
     
 }
 
@@ -132,10 +132,7 @@ function point({ x, y }, z) {
 function line({ x, y }, { x: x2, y: y2 }) {
     ctx.strokeStyle = fg
     ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(x, y)
     ctx.lineTo(x2, y2)
-    ctx.stroke()
 }
 
 function screen(p) {
@@ -239,6 +236,10 @@ function crossProduct(p1, p2, p3){
     }   
 }
 
+function dotProduct(v1, v2){
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+}
+
 function normVect(v1){
     const t = Math.sqrt(v1.x**2 + v1.y**2 + v1.z**2)
     return {
@@ -284,20 +285,43 @@ function frame() {
         dz += Math.sin(yaw) * speed * dt
     }
     angle += Math.PI * dt *0 /4
+
+
+    const sortedFaces = [...fcs].sort((a, b) => {
+        const aAverageZ = a.reduce((sum, index) => sum + rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[index], angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt).z, 0) / a.length
+        const bAverageZ = b.reduce((sum, index) => sum + rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[index], angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt).z, 0) / b.length
+        return bAverageZ - aAverageZ
+    })
     
 
     // Each face is to be a triangle
-    for (const fc of fcs) {
+    for (const fc of sortedFaces) {
 
-        const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[0]], vs[fc[1]], vs[fc[2]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-        const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(normVect(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]])), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+        //Cross product uses assumption of clockwise rotation of vertice assignment
+        const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[0]], vs[fc[1]], vs[fc[2]]), angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt)
+        const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(normVect(crossProduct(vs[fc[1]], vs[fc[2]], vs[fc[0]])), midpoint(vs[fc[0]], vs[fc[1]], vs[fc[2]])), angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt)
+        
+        const normal = normVect(subVector(n1, mp))
+        const toCam = normVect(subVector(mp, {x:0,y:0,z:0}))
+        const faceDir = dotProduct(normal, toCam)
+
+        if(faceDir > 0){
+            continue
+        }
+
+        // if(n1.z >= 0 && mp.z >= 0){
+        //     line(screen(project(n1)), screen(project(mp)))  
+        //     point(screen(project(n1)), n1.z)
+        // }
+
 
         //We do a for loop that takes the fc element length bcs some obj files do not only have triangles, some have quads and n-gons, so the code above me will only work if fc has at least 3 components (a triangle, can be anything more complex than a triangle though as long as it lies on one plane)
+        ctx.beginPath()
         for (let i = 0; i < fc.length; i++) {
             //Research how the rotation matrix works and why mouseY has to be negative
             yaw = mouseX*dt
-            const v1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[fc[i]], angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-            const v2 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[fc[(i + 1) % fc.length]], angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
+            const v1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[fc[i]], angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt)
+            const v2 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(vs[fc[(i + 1) % fc.length]], angle), angle), dz), dx), dy), mouseX*dt), -mouseY*dt)
 
             if(v2.z <= 0 && v1.z <= 0){
                 continue
@@ -317,17 +341,12 @@ function frame() {
             else{
                 line(screen(project(v1)),screen(project((v2))))
             }
-
-                if(i == 1){
-                    const mp = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]]), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    const n1 = rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(addVector(normVect(crossProduct(vs[fc[i]], vs[fc[i-1]], vs[fc[i+1]])), midpoint(vs[fc[i-1]], vs[fc[i]], vs[fc[i+1]])), angle), 0), dz), dx), dy), mouseX*dt), -mouseY*dt)
-                    const normal = n1-mp
-                    if(n1.z >= 0 && mp.z >= 0){
-                        line(screen(project(n1)), screen(project(mp)))
-                        point(screen(project(n1)), n1.z)
-                    }
-                }
         }
+        ctx.closePath()
+        //ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, Math.max(0, -faceDir))})`
+        const shade = Math.round(255 * Math.min(1, Math.max(0, -faceDir)))
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`
+        ctx.fill()
     }
     setTimeout(frame, 1000 / FPS)
 }
