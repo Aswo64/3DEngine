@@ -7,6 +7,8 @@ const ctx = canvas.getContext("2d")
 
 
 const dropzone = document.querySelector('.dropzone');
+const speedSlider = document.getElementById('speedSlider');
+const speedValue = document.getElementById('speedValue');
 const reader = new FileReader();
 let vs = [];
 let fcs = [];
@@ -26,6 +28,21 @@ let cw = false;
 let rotAnim = 1;
 let rotX = 0;
 let rotY = 0;
+
+function updateSpeed() {
+    speed = Number(speedSlider.value);
+    if (speedValue) {
+        speedValue.textContent = `${Number(speedSlider.value).toFixed(2)}x`;
+    }
+    console.log(speed);
+}
+
+if (speedSlider) {
+    speedSlider.addEventListener('input', () => {
+        updateSpeed();
+    });
+    updateSpeed();
+}
 
 function parseObjFile(fileText) {
     vs = [];
@@ -66,8 +83,7 @@ function parseObjFile(fileText) {
                 fcs.push([a,b,c]);
             }
     }
-    //Recalculates the speed so viewing larger models aren't a pain in the ass
-    speed = Math.sqrt(biggest**2 + smallest**2)/1.5
+    updateSpeed();
     
 }
 
