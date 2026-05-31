@@ -15,6 +15,7 @@ let fcs = [];
 let smallest = 0;
 let biggest = 0;
 let speed = 0;
+let speedScale = 1;
 let wireFramebool = true;
 let transparency = false;
 let fillObj = false;
@@ -24,25 +25,18 @@ const brightness = 0;
 let lightDir = [{x:1, y:0, z:0}, {x:-1, y:0, z:0}];
 let colour = [0,100,0];
 let viewNormal = false;
-let cw = false;
-let rotAnim = 1;
+let cw = true;
+let rotAnim = 0;
 let rotX = 0;
 let rotY = 0;
 
-function updateSpeed() {
-    speed = Number(speedSlider.value);
-    if (speedValue) {
-        speedValue.textContent = `${Number(speedSlider.value).toFixed(2)}x`;
-    }
-    console.log(speed);
-}
 
-if (speedSlider) {
-    speedSlider.addEventListener('input', () => {
-        updateSpeed();
-    });
-    updateSpeed();
-}
+
+speedSlider.addEventListener('input', () => {
+    speedScale = Number(speedSlider.value);
+    speedValue.textContent = `Speed: ${Number(speedSlider.value).toFixed(2)}x`;
+    speed = Math.sqrt(biggest**2 + smallest**2)*speedScale;
+});
 
 function parseObjFile(fileText) {
     vs = [];
@@ -83,7 +77,7 @@ function parseObjFile(fileText) {
                 fcs.push([a,b,c]);
             }
     }
-    updateSpeed();
+    speed = Math.sqrt(biggest**2 + smallest**2)*speedScale;
     
 }
 
