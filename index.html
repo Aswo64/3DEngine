@@ -179,14 +179,16 @@
             <span>Wireframe</span>
             <input type="checkbox" id="wireframeToggle" checked>
         </label>
-        <label for="transparencyToggle">
-            <span>Transparency</span>
-            <input type="checkbox" id="transparencyToggle">
-        </label>
         <label for="fillObjToggle">
             <span>Fill Object</span>
             <input type="checkbox" id="fillObjToggle">
         </label>
+        <div id="transparencyContainer" style="visibility:hidden; opacity:0; width:100%; transition:opacity 0.15s ease; pointer-events:none;">
+            <label for="transparencyToggle">
+                <span>Transparency</span>
+                <input type="checkbox" id="transparencyToggle">
+            </label>
+        </div>
         <label for="cullToggle">
             <span>Cull Backfaces</span>
             <input type="checkbox" id="cullToggle" checked>
@@ -198,11 +200,6 @@
         <label for="cwToggle">
             <span>Clockwise Winding</span>
             <input type="checkbox" id="cwToggle" checked>
-        </label>
-        
-        <label for="dirLightToggle">
-            <span>Directional Light</span>
-            <input type="checkbox" id="dirLightToggle">
         </label>
         <label for="brightnessSlider">
             <span id="brightnessValue">Brightness: 0%</span>
@@ -216,6 +213,25 @@
                 <input type="number" id="colourBInput" min="0" max="255" step="1" value="0">
             </div>
         </label>
+        <label for="dirLightToggle">
+            <span>Directional Light</span>
+            <input type="checkbox" id="dirLightToggle">
+        </label>
+        <div id="dirLightContainer" style="visibility:hidden; opacity:0; width:100%; transition:opacity 0.15s ease; pointer-events:none;">
+            <label>
+                <span>Light Direction (X, Y, Z)</span>
+                <div class="vectorFields">
+                    <input type="number" id="lightDirXInput" step="0.1" value="1">
+                    <input type="number" id="lightDirYInput" step="0.1" value="0">
+                    <input type="number" id="lightDirZInput" step="0.1" value="0">
+                </div>
+            </label>
+            <button type="button" id="addLightDirButton">Add Light Direction</button>
+            <label for="lightDirDropdown">
+                <span>lightDir Array</span>
+                <select id="lightDirDropdown"></select>
+            </label>
+        </div>
         <label>
             <span>Rotation (X, Y)</span>
             <div class="rgbFields rotationFields">
@@ -227,19 +243,7 @@
             <span>Rotation Animation</span>
             <input type="checkbox" id="rotAnimToggle">
         </label>
-        <label>
-            <span>Light Direction (X, Y, Z)</span>
-            <div class="vectorFields">
-                <input type="number" id="lightDirXInput" step="0.1" value="1">
-                <input type="number" id="lightDirYInput" step="0.1" value="0">
-                <input type="number" id="lightDirZInput" step="0.1" value="0">
-            </div>
-        </label>
-        <button type="button" id="addLightDirButton">Add Light Direction</button>
-        <label for="lightDirDropdown">
-            <span>lightDir Array</span>
-            <select id="lightDirDropdown"></select>
-        </label>
+        
 
         <div class="exampleSection">
             <h3>Example OBJ Files</h3>

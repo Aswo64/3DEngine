@@ -13,6 +13,7 @@ const speedSlider = document.getElementById('speedSlider');
 const speedValue = document.getElementById('speedValue');
 const wireframeToggle = document.getElementById('wireframeToggle');
 const transparencyToggle = document.getElementById('transparencyToggle');
+const transparencyContainer = document.getElementById('transparencyContainer');
 const fillObjToggle = document.getElementById('fillObjToggle');
 const cullToggle = document.getElementById('cullToggle');
 const viewNormalToggle = document.getElementById('viewNormalToggle');
@@ -31,6 +32,7 @@ const lightDirYInput = document.getElementById('lightDirYInput');
 const lightDirZInput = document.getElementById('lightDirZInput');
 const addLightDirButton = document.getElementById('addLightDirButton');
 const lightDirDropdown = document.getElementById('lightDirDropdown');
+const dirLightContainer = document.getElementById('dirLightContainer');
 const exampleSelect = document.getElementById('exampleSelect');
 const reader = new FileReader();
 let vs = [];
@@ -78,6 +80,15 @@ transparencyToggle.addEventListener('change', () => {
 
 fillObjToggle.addEventListener('change', () => {
     fillObj = fillObjToggle.checked;
+        if (transparencyContainer) {
+            transparencyContainer.style.visibility = fillObj ? 'visible' : 'hidden';
+            transparencyContainer.style.opacity = fillObj ? '1' : '0';
+            transparencyContainer.style.pointerEvents = fillObj ? 'auto' : 'none';
+        }
+    if (!fillObj) {
+        transparencyToggle.checked = false;
+        transparency = false;
+    }
 });
 
 cullToggle.addEventListener('change', () => {
@@ -94,6 +105,15 @@ cwToggle.addEventListener('change', () => {
 
 dirLightToggle.addEventListener('change', () => {
     dirLightBool = dirLightToggle.checked;
+    if (dirLightContainer) {
+        dirLightContainer.style.visibility = dirLightBool ? 'visible' : 'hidden';
+        dirLightContainer.style.opacity = dirLightBool ? '1' : '0';
+        dirLightContainer.style.pointerEvents = dirLightBool ? 'auto' : 'none';
+    }
+    if (!dirLightBool) {
+        lightDir = [];
+        updateLightDirDropdown();
+    }
 });
 
 brightnessSlider.addEventListener('input', () => {
