@@ -7,6 +7,8 @@ const ctx = canvas.getContext("2d")
 
 
 const dropzone = document.querySelector('.dropzone');
+const fovSlider = document.getElementById('fovSlider');
+const fovValue = document.getElementById('fovValue');
 const speedSlider = document.getElementById('speedSlider');
 const speedValue = document.getElementById('speedValue');
 const wireframeToggle = document.getElementById('wireframeToggle');
@@ -50,8 +52,15 @@ let cw = true;
 let rotAnim = 0;
 let rotX = 0;
 let rotY = 0;
+let fov = Math.PI/1.7;
 
 
+
+fovSlider.addEventListener('input', () => {
+    const fovDegrees = Number(fovSlider.value);
+    fov = fovDegrees * Math.PI / 180;
+    fovValue.textContent = `FOV: ${fovDegrees.toFixed(0)}°`;
+});
 
 speedSlider.addEventListener('input', () => {
     speedScale = Number(speedSlider.value);
@@ -321,7 +330,7 @@ function screen(p) {
     }
 }
 
-const fov = Math.PI/1.7
+
 
 function project({ x, y, z }) {
     return {
@@ -535,6 +544,7 @@ function frame() {
         if(fillObj){
             let shade = 0
             if(dirLightBool){
+                // I can't just use the camera as 0,0,0 because I need the light source to move with all objects, if I used the camera's origin, it would result in values that changes when I as the camera/player move, we don't want that, we want a vector that remains in the same direction that can be referred to when 1. calculating shading and 2. the player moves/rotates
                 for (const lv of lightDir){
                     shade+=Math.min(1, Math.max(0, -dotProduct(normal, normVect(subVector(rotate_x(rotate_y(translate_y(translate_x(translate_z(lv, dz), dx), dy), mouseX*dt), -mouseY*dt),newVert({x:0, y:0, z:0}))))))
                 }
@@ -547,7 +557,6 @@ function frame() {
                 ctx.fillStyle = `rgba(${colour[0]}, ${colour[1]}, ${colour[2]}, ${shade*(1+(brightness/100))})`
             }
             else{
-                // I can't just use the camera as 0,0,0 because I need the light source to move with all objects, if I used the camera's origin, it would result in values that changes when I as the camera/player move, we don't want that, we want a vector that remains in the same direction that can be referred to when 1. calculating shading and 2. the player moves/rotates
                 ctx.fillStyle = `rgb(${alphaShade+colour[0]}, ${alphaShade+colour[1]}, ${alphaShade+colour[2]})`
             }
             ctx.fill()

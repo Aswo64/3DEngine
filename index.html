@@ -9,11 +9,17 @@
     html, body {
         overflow: hidden;
         height: 100%;
+        margin: 0;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        min-height: 100vh;
     }
     .sidebar {
-        position: fixed;
-        left: 1020px;
-        top: 10px;
         width: 220px;
     }
 
@@ -59,7 +65,7 @@
 
     .controls {
         display: grid;
-        gap: 10px;
+        gap: 9px;
         width: 100%;
         color: black;
         font-family: Arial, sans-serif;
@@ -161,6 +167,10 @@
     </div>
 
     <div class="controls">
+        <label for="fovSlider">
+            <span id="fovValue">FOV: 106°</span>
+            <input type="range" id="fovSlider" min="30" max="179" step="1" value="106">
+        </label>
         <label for="speedSlider">
             <span id="speedValue">Speed: 1.00x</span>
             <input type="range" id="speedSlider" min="0.25" max="3" step="0.05" value="1">
