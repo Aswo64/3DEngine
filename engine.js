@@ -18,6 +18,7 @@ const fillObjToggle = document.getElementById('fillObjToggle');
 const cullToggle = document.getElementById('cullToggle');
 const viewNormalToggle = document.getElementById('viewNormalToggle');
 const cwToggle = document.getElementById('cwToggle');
+const cwContainer = document.getElementById('cwContainer');
 const dirLightToggle = document.getElementById('dirLightToggle');
 const brightnessSlider = document.getElementById('brightnessSlider');
 const brightnessValue = document.getElementById('brightnessValue');
@@ -93,6 +94,11 @@ fillObjToggle.addEventListener('change', () => {
 
 cullToggle.addEventListener('change', () => {
     cullBool = cullToggle.checked;
+    if (cwContainer) {
+        cwContainer.style.visibility = cullBool ? 'visible' : 'hidden';
+        cwContainer.style.opacity = cullBool ? '1' : '0';
+        cwContainer.style.pointerEvents = cullBool ? 'auto' : 'none';
+    }
 });
 
 viewNormalToggle.addEventListener('change', () => {

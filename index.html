@@ -189,18 +189,20 @@
                 <input type="checkbox" id="transparencyToggle">
             </label>
         </div>
-        <label for="cullToggle">
-            <span>Cull Backfaces</span>
-            <input type="checkbox" id="cullToggle" checked>
-        </label>
         <label for="viewNormalToggle">
             <span>View Normals</span>
             <input type="checkbox" id="viewNormalToggle">
         </label>
-        <label for="cwToggle">
-            <span>Clockwise Winding</span>
-            <input type="checkbox" id="cwToggle" checked>
+        <label for="cullToggle">
+            <span>Cull Backfaces<br> (Useful for double-sided objs)</span>
+            <input type="checkbox" id="cullToggle" checked>
         </label>
+        <div id="cwContainer" style="visibility:visible; opacity:1; width:100%; transition:opacity 0.15s ease; pointer-events:auto;">
+            <label for="cwToggle">
+                <span>Clockwise Winding</span>
+                <input type="checkbox" id="cwToggle" checked>
+            </label>
+        </div>
         <label for="brightnessSlider">
             <span id="brightnessValue">Brightness: 0%</span>
             <input type="range" id="brightnessSlider" min="-100" max="100" step="1" value="0">
