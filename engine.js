@@ -9,6 +9,26 @@ const ctx = canvas.getContext("2d")
 const dropzone = document.querySelector('.dropzone');
 const speedSlider = document.getElementById('speedSlider');
 const speedValue = document.getElementById('speedValue');
+const wireframeToggle = document.getElementById('wireframeToggle');
+const transparencyToggle = document.getElementById('transparencyToggle');
+const fillObjToggle = document.getElementById('fillObjToggle');
+const cullToggle = document.getElementById('cullToggle');
+const viewNormalToggle = document.getElementById('viewNormalToggle');
+const cwToggle = document.getElementById('cwToggle');
+const dirLightToggle = document.getElementById('dirLightToggle');
+const brightnessSlider = document.getElementById('brightnessSlider');
+const brightnessValue = document.getElementById('brightnessValue');
+const colourRInput = document.getElementById('colourRInput');
+const colourGInput = document.getElementById('colourGInput');
+const colourBInput = document.getElementById('colourBInput');
+const rotXInput = document.getElementById('rotXInput');
+const rotYInput = document.getElementById('rotYInput');
+const rotAnimToggle = document.getElementById('rotAnimToggle');
+const lightDirXInput = document.getElementById('lightDirXInput');
+const lightDirYInput = document.getElementById('lightDirYInput');
+const lightDirZInput = document.getElementById('lightDirZInput');
+const addLightDirButton = document.getElementById('addLightDirButton');
+const lightDirDropdown = document.getElementById('lightDirDropdown');
 const reader = new FileReader();
 let vs = [];
 let fcs = [];
@@ -21,8 +41,8 @@ let transparency = false;
 let fillObj = false;
 let cullBool = true;
 let dirLightBool = false;
-const brightness = 0;
-let lightDir = [{x:1, y:0, z:0}, {x:-1, y:0, z:0}];
+let brightness = 0;
+let lightDir = [];
 let colour = [0,100,0];
 let viewNormal = false;
 let cw = true;
@@ -38,16 +58,118 @@ speedSlider.addEventListener('input', () => {
     speed = Math.sqrt(biggest**2 + smallest**2)*speedScale;
 });
 
+wireframeToggle.addEventListener('change', () => {
+    wireFramebool = wireframeToggle.checked;
+});
+
+transparencyToggle.addEventListener('change', () => {
+    transparency = transparencyToggle.checked;
+});
+
+fillObjToggle.addEventListener('change', () => {
+    fillObj = fillObjToggle.checked;
+});
+
+cullToggle.addEventListener('change', () => {
+    cullBool = cullToggle.checked;
+});
+
+viewNormalToggle.addEventListener('change', () => {
+    viewNormal = viewNormalToggle.checked;
+});
+
+cwToggle.addEventListener('change', () => {
+    cw = cwToggle.checked;
+});
+
+dirLightToggle.addEventListener('change', () => {
+    dirLightBool = dirLightToggle.checked;
+});
+
+brightnessSlider.addEventListener('input', () => {
+    brightness = Number(brightnessSlider.value);
+    brightnessValue.textContent = `Brightness: ${brightnessSlider.value}%`;
+});
+
+
+function clampChannel(value) {
+    return Math.max(0, Math.min(255, Number(value) || 0));
+}
+
+function updateColourFromInputs() {
+    const r = clampChannel(colourRInput.value);
+    const g = clampChannel(colourGInput.value);
+    const b = clampChannel(colourBInput.value);
+
+    colour = [r, g, b];
+    colourRInput.value = String(r);
+    colourGInput.value = String(g);
+    colourBInput.value = String(b);
+}
+
+colourRInput.addEventListener('input', updateColourFromInputs);
+colourGInput.addEventListener('input', updateColourFromInputs);
+colourBInput.addEventListener('input', updateColourFromInputs);
+
+function updateRotationFromInputs() {
+    rotX = Number(rotXInput.value) || 0;
+    rotY = Number(rotYInput.value) || 0;
+
+    rotXInput.value = String(rotX);
+    rotYInput.value = String(rotY);
+}
+
+rotXInput.addEventListener('input', updateRotationFromInputs);
+rotYInput.addEventListener('input', updateRotationFromInputs);
+
+rotAnimToggle.addEventListener('change', () => {
+    rotAnim = rotAnimToggle.checked ? 1 : 0;
+});
+
+function readLightDirectionInputs() {
+    return {
+        x: Number(lightDirXInput.value) || 0,
+        y: Number(lightDirYInput.value) || 0,
+        z: Number(lightDirZInput.value) || 0,
+    };
+}
+
+function updateLightDirDropdown() {
+    lightDirDropdown.innerHTML = '';
+
+    if (lightDir.length === 0) {
+        const emptyOption = document.createElement('option');
+        emptyOption.textContent = 'lightDir is empty';
+        emptyOption.value = '';
+        lightDirDropdown.appendChild(emptyOption);
+        return;
+    }
+
+    lightDir.forEach((direction, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = `${index}: x=${direction.x}, y=${direction.y}, z=${direction.z}`;
+        lightDirDropdown.appendChild(option);
+    });
+}
+
+addLightDirButton.addEventListener('click', () => {
+    lightDir.push(readLightDirectionInputs());
+    updateLightDirDropdown();
+});
+
+
 function parseObjFile(fileText) {
     vs = [];
     fcs = [];
     const lines = fileText.split(/\r?\n/);
     smallest = 0
     biggest = 0
-    //Puts camera back to origin so you don't have to go on a pilgramage to get back to see smaller models
-    dx = 0
-    dy = 0
-    dz = 0
+    // track per-axis mins/maxs so we can centre the model
+    let minX = 0, maxX = 0;
+    let minY = 0, maxY = 0;
+    let minZ = 0, maxZ = 0;
+    let firstVertex = true;
 
     for (let line of lines) {
         line = line.trim();
@@ -59,17 +181,26 @@ function parseObjFile(fileText) {
         const parts = line.split(/\s+/);
 
         if (line.startsWith('v ')) {
-            smallest = Math.min(smallest, ...parts.slice(1,4).map(Number))
-            biggest = Math.max(biggest, ...parts.slice(1,4).map(Number))
-            vs.push({
-            x: parseFloat(parts[1]),
-            y: parseFloat(parts[2]),
-            z: parseFloat(parts[3])
-        });
-        } 
+            const x = parseFloat(parts[1]);
+            const y = parseFloat(parts[2]);
+            const z = parseFloat(parts[3]);
+
+            smallest = Math.min(smallest, x, y, z);
+            biggest = Math.max(biggest, x, y, z);
+
+
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+            minZ = Math.min(minZ, z);
+            maxZ = Math.max(maxZ, z);
+
+            vs.push({ x, y, z });
+        }
         if (line.startsWith('f ')) {
                 const parts = line.split(/\s+/);
-                // We subtract one because obj files start from 1, not 0
+                // We subtract one because obj files start from 1 for faces, not 0
                 const a = parseInt(parts[1].split('/')[0], 10)-1;
                 const b = parseInt(parts[2].split('/')[0], 10)-1;
                 const c = parseInt(parts[3].split('/')[0], 10)-1;
@@ -77,7 +208,15 @@ function parseObjFile(fileText) {
                 fcs.push([a,b,c]);
             }
     }
+    const avgX = (minX + maxX) / 2;
+    const avgY = (minY + maxY) / 2;
+    const avgZ = (minZ + maxZ) / 2;
+
+    // Resets the camera position so u don't have to go on a pilgramige to find the object
+    dx = -avgX;
+    dy = -avgY;
     speed = Math.sqrt(biggest**2 + smallest**2)*speedScale;
+    dz = -avgZ+speed;
     
 }
 
@@ -259,9 +398,6 @@ function crossProduct(p1, p2, p3){
         v1 = subVector(p3, p1)
         v2 = subVector(p2, p1)
     }
-    
-    
-
     return {
         x: v1.y * v2.z - v1.z * v2.y,
         y: v1.z * v2.x - v1.x * v2.z,
@@ -291,7 +427,7 @@ function midpoint(p1, p2, p3){
 }
 
 function newVert(v1){
-    return rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(v1, angle + rotX), angle+rotY), dz), dx), dy), mouseX*dt), -mouseY*dt)
+    return rotate_x(rotate_y(translate_y(translate_x(translate_z(rotate_x(rotate_y(v1, angle + rotY), angle+rotX), dz), dx), dy), mouseX*dt), -mouseY*dt)
 }
 
 function frame() {
