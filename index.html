@@ -23,7 +23,7 @@
         justify-items: center;
         align-items: center;
         border: 2px dashed #ccc;
-        border-radius: 10px;
+        border-radius: 15px;
         cursor: pointer;
         transition: background-color 0.3s ease, border-color 0.3s ease;
         width: 100%;
@@ -127,12 +127,31 @@
         background: #f2f2f2;
         color: #000;
     }
+
+    .exampleSection {
+        display: grid;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .exampleSection h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .exampleButtons {
+        display: grid;
+        gap: 6px;
+        width: 100%;
+    }
     
 </style>
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas" style="border-radius: 15px;"></canvas>
     <script src="engine.js" defer></script>
 
     <div class="sidebar">
@@ -211,6 +230,19 @@
             <span>lightDir Array</span>
             <select id="lightDirDropdown"></select>
         </label>
+
+        <div class="exampleSection">
+            <h3>Example OBJ Files</h3>
+            <label for="exampleSelect">
+                <select id="exampleSelect">
+                    <option value="">Select a really cool example</option>
+                    <option value="korok.obj">korok.obj</option>
+                    <option value="cube.obj">cube.obj</option>
+                    <option value="Beija Flor.obj">Beija Flor.obj</option>
+                    <option value="masterSword.obj">masterSword.obj</option>
+                </select>
+            </label>
+        </div>
         
     </div>
     </div>

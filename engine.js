@@ -29,6 +29,7 @@ const lightDirYInput = document.getElementById('lightDirYInput');
 const lightDirZInput = document.getElementById('lightDirZInput');
 const addLightDirButton = document.getElementById('addLightDirButton');
 const lightDirDropdown = document.getElementById('lightDirDropdown');
+const exampleSelect = document.getElementById('exampleSelect');
 const reader = new FileReader();
 let vs = [];
 let fcs = [];
@@ -156,6 +157,22 @@ function updateLightDirDropdown() {
 addLightDirButton.addEventListener('click', () => {
     lightDir.push(readLightDirectionInputs());
     updateLightDirDropdown();
+});
+
+
+exampleSelect.addEventListener('change', async () => {
+    const model = exampleSelect.value;
+    if (!model) return;
+    try {
+        const response = await fetch(encodeURI(model));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        // prefer blob.text() to avoid reusing global FileReader
+        const text = await blob.text();
+        parseObjFile(text);
+    } catch (error) {
+        console.error('Failed to load example model', model, error);
+    }
 });
 
 
@@ -519,7 +536,7 @@ function frame() {
             let shade = 0
             if(dirLightBool){
                 for (const lv of lightDir){
-                    shade+=Math.min(1, Math.max(0, -dotProduct(normal, normVect(subVector(newVert(lv),newVert({x:0, y:0, z:0}))))))
+                    shade+=Math.min(1, Math.max(0, -dotProduct(normal, normVect(subVector(rotate_x(rotate_y(translate_y(translate_x(translate_z(lv, dz), dx), dy), mouseX*dt), -mouseY*dt),newVert({x:0, y:0, z:0}))))))
                 }
             }
             else{
