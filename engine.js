@@ -509,17 +509,16 @@ function frame() {
         dz += Math.sin(yaw) * speed * dt
     }
     angle += Math.PI * dt * rotAnim /4
-
-
+    
+    
     const sortedFaces = [...fcs].sort((a, b) => {
         const aAverageZ = a.reduce((sum, index) => sum + newVert(vs[index]).z, 0) / a.length
         const bAverageZ = b.reduce((sum, index) => sum + newVert(vs[index]).z, 0) / b.length
         return bAverageZ - aAverageZ
     })
-
+    
     // Each face is to be a triangle
     for (const fc of sortedFaces) {
-
         //Cross product uses assumption of clockwise rotation of vertice assignment
         const preTransMidpoint = midpoint(vs[fc[0]], vs[fc[1]], vs[fc[2]])
         const mp = newVert(preTransMidpoint)
@@ -528,11 +527,11 @@ function frame() {
         const normal = normVect(subVector(n1, mp))
         const toCam = normVect(subVector(mp, {x:0,y:0,z:0}))
         const faceDir = dotProduct(normal, toCam)
-
+        
         if(faceDir > 0 && cullBool){
             continue
         }
-
+        
         //We do a for loop that takes the fc element length bcs some obj files do not only have triangles, some have quads and n-gons, so the code above me will only work if fc has at least 3 components (a triangle, can be anything more complex than a triangle though as long as it lies on one plane)
         ctx.beginPath()
         for (let i = 0; i < fc.length; i++) {
@@ -540,25 +539,26 @@ function frame() {
             yaw = mouseX*dt
             const v1 = newVert(vs[fc[i]])
             const v2 = newVert(vs[fc[(i + 1) % fc.length]])
-
+            
             if(v2.z <= 0 && v1.z <= 0){
                 continue
             }
             if (v1.z <= 0 || v2.z <= 0) {
                 let p1 = v1
                 let p2 = v2
-
+                
                 if (v2.z <= 0) {
                     p1 = v2
                     p2 = v1
                 }
                 const t = (0.001 - p1.z) / (p2.z - p1.z)
                 const v3 = addVector(p1, scalarVector(subVector(p2, p1), t))
-                // ctx.moveTo(screen(project((p2))).x, screen(project((p2))).y)
+                
+                ctx.moveTo(screen(project((p2))).x, screen(project((p2))).y)
                 line(screen(project((v3))))
             }
             else{
-                // ctx.lineTo(screen(project(v1)).x, screen(project(v1)).y)
+                ctx.lineTo(screen(project(v1)).x, screen(project(v1)).y)
                 line(screen(project((v2))))
             }
         }
